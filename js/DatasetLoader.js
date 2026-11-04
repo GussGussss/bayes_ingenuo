@@ -1,28 +1,46 @@
+// DatasetLoader: Clase encargada de convertir el archivo cargado (.csv / .txt)
+// en una estructura de datos en memoria (matriz de celdas de texto).
 class DatasetLoader {
-  static leer(archivo, config) {
-    return archivo.text().then((texto) => DatasetLoader.parsear(texto, config));
+  //funcion simple para leer el dataset
+  static leer(archivoObjeto, configuracion) {
+    return archivoObjeto
+      .text()
+      .then((textoCompleto) =>
+        DatasetLoader.parsear(textoCompleto, configuracion),
+      );
   }
 
-  static parsear(texto, config) {
-    //saber si hay tabuladores
-    const sep = config.separador === "\\t" ? "\t" : config.separador;
-    //quitar caracteres invisibles y divide el texto en unarreglo de lineas
-    const lineas = texto
-      .replace(/^/, "")
+  //funcion que parsea todo el dataset y lo hace una matriz de datos
+  static parsear(textoCompleto, configuracion) {
+    //ajustar el separador y separar el texto en renglones limpios
+    const separadorEfectivo =
+      configuracion.separador === "\\t" ? "\t" : configuracion.separador;
+
+    const lineasValidas = textoCompleto
+      .replace(/^﻿/, "")
       .split(/\r?\n/)
-      .filter((l) => l.trim() !== "");
+      .filter((lineaTexto) => lineaTexto.trim() !== "");
 
-    const quitarComillas = (c) => c.trim().replace(/^"(.*)"$/, "$1");
-    // Con espacio como separador se aceptan varios espacios seguidos
-    const dividir = (l) =>
-      sep === " " ? l.trim().split(/\s+/) : l.split(sep).map(quitarComillas);
-    //llama a dividir para poner todo en una matriz
-    const celdas = lineas.map(dividir);
+    //Quitar comillas, dividir cada renglon y armar la matriz de datos
+    const quitarComillasTexto = (contenidoCelda) =>
+      contenidoCelda.trim().replace(/^"(.*)"$/, "$1");
 
-    //saber si hay encabezados y con shif las quita
+    const dividirLinea = (lineaTexto) =>
+      separadorEfectivo === " "
+        ? lineaTexto.trim().split(/\s+/)
+        : lineaTexto.split(separadorEfectivo).map(quitarComillasTexto);
+
+    const matrizCeldas = lineasValidas.map(dividirLinea);
+
+    //separar la fila de nombres de columnas y devolverlos limpios
     const encabezados =
-      config.tieneEncabezado && celdas.length ? celdas.shift() : null;
+      configuracion.tieneEncabezado && matrizCeldas.length
+        ? matrizCeldas.shift()
+        : null;
 
-    return { encabezados, celdas };
+    return {
+      encabezados,
+      celdas: matrizCeldas,
+    };
   }
 }

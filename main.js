@@ -1,183 +1,220 @@
-// =====================================================
-// main.js  -  Conecta la interfaz (HTML) con el programa
-// En esta fase solo manejamos la interfaz:
-//   1. Habilitar / deshabilitar opciones según lo elegido
-//   2. Leer la configuración que eligió el usuario
-// =====================================================
+// main.js: Módulo orquestador principal del sistema. Conecta los controles de la interfaz HTML
+// con las clases lógicas del proyecto (DatasetLoader, DatasetValidator, DataSplitter, Clasificador, Evaluator y Resultados).
 
-// Atajo para no escribir document.getElementById todo el tiempo
-const $ = (id) => document.getElementById(id);
+// Función auxiliar atajo para obtener elementos del DOM por su identificador ID
+const obtenerElementoPorId = (idElemento) =>
+  document.getElementById(idElemento);
 
-// Devuelve el valor del radio seleccionado de un grupo (por su "name")
-function valorRadio(nombre) {
-  return document.querySelector('input[name="' + nombre + '"]:checked').value;
+// Función auxiliar para obtener el valor del botón de radio que esté actualmente marcado en un grupo
+function obtenerValorRadioSeleccionado(nombreGrupoRadio) {
+  //buscar qué opción radio de un grupo está seleccionada por el usuario
+
+  return document.querySelector(
+    'input[name="' + nombreGrupoRadio + '"]:checked',
+  ).value;
 }
 
-// Activa o desactiva todos los radios de un grupo
-function habilitarRadios(nombre, habilitado) {
-  document.querySelectorAll('input[name="' + nombre + '"]').forEach((r) => {
-    r.disabled = !habilitado;
-  });
+// Función auxiliar para activar o desactivar todos los botones de radio pertenecientes a un grupo
+function cambiarEstadoGrupoRadios(nombreGrupoRadio, estaHabilitado) {
+  // habilitar o deshabilitar todos los radios de un mismo grupo en la interfaz
+  document
+    .querySelectorAll('input[name="' + nombreGrupoRadio + '"]')
+    .forEach((elementoRadio) => {
+      elementoRadio.disabled = !estaHabilitado;
+    });
 }
 
-// -----------------------------------------------------
-// Habilita solo lo que tiene sentido según las opciones
-// -----------------------------------------------------
+// Función para activar o desactivar dinámicamente los controles HTML del formulario según la selección del usuario
 function actualizarInterfaz() {
-  // --- Pruebas ---
-  const usaMismoDataset = valorRadio("modo") === "mismo";
-  const esSimple = usaMismoDataset && valorRadio("validacion") === "simple";
+  // Bloque para habilitar únicamente los campos válidos según las opciones seleccionadas
 
-  habilitarRadios("validacion", usaMismoDataset);
-  $("porcentaje").disabled = !esSimple;
-  $("estratificado").disabled = !esSimple;
-  $("archivoExterno").disabled = usaMismoDataset;
+  const usaMismoDataset = obtenerValorRadioSeleccionado("modo") === "mismo";
+  const esValidacionSimple =
+    usaMismoDataset && obtenerValorRadioSeleccionado("validacion") === "simple";
 
-  // --- Variables continuas ---
-  const usaBinning = valorRadio("continuas") === "binning";
+  cambiarEstadoGrupoRadios("validacion", usaMismoDataset);
+  obtenerElementoPorId("porcentaje").disabled = !esValidacionSimple;
+  obtenerElementoPorId("estratificado").disabled = !esValidacionSimple;
+  obtenerElementoPorId("archivoExterno").disabled = usaMismoDataset;
 
-  habilitarRadios("tipoBinning", usaBinning);
-  $("intervalos").disabled = !usaBinning;
+  const usaTratamientoBinning =
+    obtenerValorRadioSeleccionado("continuas") === "binning";
+
+  cambiarEstadoGrupoRadios("tipoBinning", usaTratamientoBinning);
+  obtenerElementoPorId("intervalos").disabled = !usaTratamientoBinning;
 }
 
-// -----------------------------------------------------
-// Junta todo lo que eligió el usuario en un solo objeto.
-// Más adelante este objeto se le pasará a las demás clases.
-// -----------------------------------------------------
+// Función para recopilar todas las opciones seleccionadas en la interfaz y empaquetarlas en un objeto
 function leerConfiguracion() {
+  // Bloque para leer todos los valores ingresados por el usuario y crear el objeto de configuración
+
   return {
-    archivoDataset: $("archivoDataset").files[0] || null,
-    posicionClase: valorRadio("posClase"), // "inicio" | "final"
-    tieneEncabezado: $("tieneEncabezado").checked,
-    separador: $("separador").value,
+    archivoDataset: obtenerElementoPorId("archivoDataset").files[0] || null,
+    posicionClase: obtenerValorRadioSeleccionado("posClase"),
+    tieneEncabezado: obtenerElementoPorId("tieneEncabezado").checked,
+    separador: obtenerElementoPorId("separador").value,
 
-    modo: valorRadio("modo"), // "mismo" | "externo"
-    validacion: valorRadio("validacion"), // "simple" | "cruzada"
-    porcentajeEntrenamiento: Number($("porcentaje").value),
-    estratificado: $("estratificado").checked,
-    archivoExterno: $("archivoExterno").files[0] || null,
+    modo: obtenerValorRadioSeleccionado("modo"),
+    validacion: obtenerValorRadioSeleccionado("validacion"),
+    porcentajeEntrenamiento: Number(obtenerElementoPorId("porcentaje").value),
+    estratificado: obtenerElementoPorId("estratificado").checked,
+    archivoExterno: obtenerElementoPorId("archivoExterno").files[0] || null,
 
-    tratamientoContinuas: valorRadio("continuas"), // "densidad" | "binning"
-    tipoBinning: valorRadio("tipoBinning"), // "anchos" | "frecuencias"
-    intervalos: Number($("intervalos").value),
+    tratamientoContinuas: obtenerValorRadioSeleccionado("continuas"),
+    tipoBinning: obtenerValorRadioSeleccionado("tipoBinning"),
+    intervalos: Number(obtenerElementoPorId("intervalos").value),
   };
 }
 
-// -----------------------------------------------------
-// Muestra errores (rojo) y avisos (amarillo) en el área de mensajes
-// -----------------------------------------------------
-function mostrarMensajes(errores, avisos) {
-  const cont = $("mensajes");
-  cont.innerHTML = "";
-  const agregar = (clase, textos) =>
-    textos.forEach((t) => {
-      const d = document.createElement("div");
-      d.className = clase;
-      d.textContent = t;
-      cont.appendChild(d);
+// Función para renderizar mensajes visuales de error (rojo) y avisos (amarillo) en el contenedor HTML
+function mostrarMensajes(listaErrores, listaAvisos) {
+  // Bloque para crear e inyectar divs con mensajes de error o advertencia en el DOM
+
+  const contenedorMensajes = obtenerElementoPorId("mensajes");
+  contenedorMensajes.innerHTML = "";
+
+  const agregarDivisionesMensaje = (claseEstiloCss, listaTextosMensaje) =>
+    listaTextosMensaje.forEach((textoMensaje) => {
+      const elementoDivMensaje = document.createElement("div");
+      elementoDivMensaje.className = claseEstiloCss;
+      elementoDivMensaje.textContent = textoMensaje;
+      contenedorMensajes.appendChild(elementoDivMensaje);
     });
-  agregar("error", errores);
-  agregar("aviso", avisos);
+
+  agregarDivisionesMensaje("error", listaErrores);
+  agregarDivisionesMensaje("aviso", listaAvisos);
 }
 
-// -----------------------------------------------------
-// Botón "Análisis": valida -> divide -> clasifica -> evalúa -> muestra
-// -----------------------------------------------------
-const SEMILLA = 12345; // fija: el reparto aleatorio es reproducible
+// Semilla numérica fija para garantizar que la generación pseudoaleatoria Mulberry32 sea totalmente reproducible
+const SEMILLA_REPRODUCIBLE = 12345;
 
+// Función principal asíncrona que orquesta todo el pipeline al presionar el botón "Análisis"
 async function ejecutarAnalisis() {
-  const config = leerConfiguracion();
+  // leer las opciones seleccionadas, resetear la pantalla y validar parámetros básicos
+
+  const objetoConfiguracion = leerConfiguracion();
   Resultados.limpiar();
   mostrarMensajes([], []);
 
-  // 1. Validar parámetros
-  const errParam = DatasetValidator.validarParametros(config);
-  if (errParam.length) return mostrarMensajes(errParam, []);
+  const erroresParametros =
+    DatasetValidator.validarParametros(objetoConfiguracion);
+  if (erroresParametros.length) return mostrarMensajes(erroresParametros, []);
 
   try {
-    // 2. Cargar y validar el dataset
-    const dat = DatasetValidator.validar(
-      await DatasetLoader.leer(config.archivoDataset, config),
-      config,
+    // Bloque para parsear el archivo con DatasetLoader.js y validar su estructura con DatasetValidator.js
+
+    const datasetPrincipal = DatasetValidator.validar(
+      await DatasetLoader.leer(
+        objetoConfiguracion.archivoDataset,
+        objetoConfiguracion,
+      ),
+      objetoConfiguracion,
       null,
     );
-    const avisos = [...dat.avisos];
-    if (dat.errores.length) return mostrarMensajes(dat.errores, avisos);
-    const { atributos, clases } = dat;
 
-    let verdaderas = [],
-      predichas = [];
-    if (config.modo === "externo") {
-      // 3a. Entrena con todo el dataset y prueba con el archivo externo
-      const ext = DatasetValidator.validar(
-        await DatasetLoader.leer(config.archivoExterno, config),
-        config,
-        { atributos, clases },
+    const listaAvisos = [...datasetPrincipal.avisos];
+    if (datasetPrincipal.errores.length)
+      return mostrarMensajes(datasetPrincipal.errores, listaAvisos);
+
+    const { atributos: listaAtributos, clases: listaClases } = datasetPrincipal;
+    let clasesVerdaderas = [];
+    let clasesPredichas = [];
+
+    if (objetoConfiguracion.modo === "externo") {
+      // entrenar con todo el dataset principal y predecir sobre las filas del archivo externo
+
+      const datasetExterno = DatasetValidator.validar(
+        await DatasetLoader.leer(
+          objetoConfiguracion.archivoExterno,
+          objetoConfiguracion,
+        ),
+        objetoConfiguracion,
+        { atributos: listaAtributos, clases: listaClases },
       );
-      if (ext.errores.length)
-        return mostrarMensajes(ext.errores, avisos.concat(ext.avisos));
-      avisos.push(
-        ...ext.avisos,
-        `Entrenamiento: ${dat.filas.length} filas. Prueba (archivo externo): ${ext.filas.length} filas.`,
+
+      if (datasetExterno.errores.length)
+        return mostrarMensajes(
+          datasetExterno.errores,
+          listaAvisos.concat(datasetExterno.avisos),
+        );
+
+      listaAvisos.push(
+        ...datasetExterno.avisos,
+        `Entrenamiento: ${datasetPrincipal.filas.length} filas. Prueba (archivo externo): ${datasetExterno.filas.length} filas.`,
       );
-      predichas = Clasificador.predecir(
-        dat.filas,
-        ext.filas,
-        atributos,
-        clases,
-        config,
+
+      clasesPredichas = Clasificador.predecir(
+        datasetPrincipal.filas,
+        datasetExterno.filas,
+        listaAtributos,
+        listaClases,
+        objetoConfiguracion,
       );
-      if (!ext.tieneClase) {
-        mostrarMensajes([], avisos);
-        return Resultados.mostrarPredicciones(ext.filas, predichas, atributos);
+
+      if (!datasetExterno.tieneClase) {
+        mostrarMensajes([], listaAvisos);
+        return Resultados.mostrarPredicciones(
+          datasetExterno.filas,
+          clasesPredichas,
+          listaAtributos,
+        );
       }
-      verdaderas = ext.filas.map((f) => f.clase);
+
+      clasesVerdaderas = datasetExterno.filas.map(
+        (objetoFila) => objetoFila.clase,
+      );
     } else {
-      // 3b. Mismo dataset: validación simple o cruzada 50%-50%
-      const rondas =
-        config.validacion === "simple"
+      // dividir el dataset en rondas de entrenamiento y prueba usando DataSplitter.js
+      const listaRondasEvaluacion =
+        objetoConfiguracion.validacion === "simple"
           ? [
               DataSplitter.simple(
-                dat.filas,
-                config.porcentajeEntrenamiento,
-                config.estratificado,
-                SEMILLA,
+                datasetPrincipal.filas,
+                objetoConfiguracion.porcentajeEntrenamiento,
+                objetoConfiguracion.estratificado,
+                SEMILLA_REPRODUCIBLE,
               ),
             ]
-          : DataSplitter.cruzada(dat.filas, SEMILLA);
-      for (const r of rondas) {
-        predichas.push(
+          : DataSplitter.cruzada(datasetPrincipal.filas, SEMILLA_REPRODUCIBLE);
+
+      for (const objetoRonda of listaRondasEvaluacion) {
+        clasesPredichas.push(
           ...Clasificador.predecir(
-            r.entrenamiento,
-            r.prueba,
-            atributos,
-            clases,
-            config,
+            objetoRonda.entrenamiento,
+            objetoRonda.prueba,
+            listaAtributos,
+            listaClases,
+            objetoConfiguracion,
           ),
         );
-        verdaderas.push(...r.prueba.map((f) => f.clase));
+        clasesVerdaderas.push(
+          ...objetoRonda.prueba.map((objetoFila) => objetoFila.clase),
+        );
       }
-      // En la cruzada se juntan las predicciones de las 2 rondas: equivale a sumar las 2 matrices
-      avisos.push(
-        rondas.length === 1
-          ? `Entrenamiento: ${rondas[0].entrenamiento.length} filas. Prueba: ${rondas[0].prueba.length} filas.`
-          : `Validación cruzada: 2 rondas de ${rondas[0].entrenamiento.length} y ${rondas[1].entrenamiento.length} filas; se evaluaron las ${verdaderas.length} filas.`,
+
+      listaAvisos.push(
+        listaRondasEvaluacion.length === 1
+          ? `Entrenamiento: ${listaRondasEvaluacion[0].entrenamiento.length} filas. Prueba: ${listaRondasEvaluacion[0].prueba.length} filas.`
+          : `Validación cruzada: 2 rondas de ${listaRondasEvaluacion[0].entrenamiento.length} y ${listaRondasEvaluacion[1].entrenamiento.length} filas; se evaluaron las ${clasesVerdaderas.length} filas.`,
       );
     }
 
-    // 4. Métricas y resultados
-    mostrarMensajes([], avisos);
-    Resultados.mostrar(Evaluator.evaluar(verdaderas, predichas, clases));
-  } catch (err) {
-    mostrarMensajes(["Error inesperado: " + err.message], []);
+    // generar la matriz de confusión con Evaluator.js y renderizar las tablas con Resultados.js
+    mostrarMensajes([], listaAvisos);
+    Resultados.mostrar(
+      Evaluator.evaluar(clasesVerdaderas, clasesPredichas, listaClases),
+    );
+  } catch (errorExcepcion) {
+    mostrarMensajes(["Error inesperado: " + errorExcepcion.message], []);
   }
 }
 
-// -----------------------------------------------------
-// Eventos: cada vez que el usuario cambia algo, se actualiza
-// -----------------------------------------------------
-$("formulario").addEventListener("change", actualizarInterfaz);
-$("btnAnalisis").addEventListener("click", ejecutarAnalisis);
+// conectar las acciones del usuario en el formulario y cargar el estado inicial
 
-// Estado inicial al abrir la página
+obtenerElementoPorId("formulario").addEventListener(
+  "change",
+  actualizarInterfaz,
+);
+obtenerElementoPorId("btnAnalisis").addEventListener("click", ejecutarAnalisis);
+
 actualizarInterfaz();
