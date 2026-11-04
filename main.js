@@ -64,28 +64,120 @@ function leerConfiguracion() {
 }
 
 // -----------------------------------------------------
-// Botón "Análisis" (por ahora solo muestra la configuración)
+// Muestra errores (rojo) y avisos (amarillo) en el área de mensajes
 // -----------------------------------------------------
-function alPresionarAnalisis() {
+function mostrarMensajes(errores, avisos) {
+  const cont = $("mensajes");
+  cont.innerHTML = "";
+  const agregar = (clase, textos) =>
+    textos.forEach((t) => {
+      const d = document.createElement("div");
+      d.className = clase;
+      d.textContent = t;
+      cont.appendChild(d);
+    });
+  agregar("error", errores);
+  agregar("aviso", avisos);
+}
+
+// -----------------------------------------------------
+// Botón "Análisis": valida -> divide -> clasifica -> evalúa -> muestra
+// -----------------------------------------------------
+const SEMILLA = 12345; // fija: el reparto aleatorio es reproducible
+
+async function ejecutarAnalisis() {
   const config = leerConfiguracion();
-  console.log("Configuración leída:", config);
+  Resultados.limpiar();
+  mostrarMensajes([], []);
 
-  const mensajes = $("mensajes");
-  mensajes.innerHTML = "";
+  // 1. Validar parámetros
+  const errParam = DatasetValidator.validarParametros(config);
+  if (errParam.length) return mostrarMensajes(errParam, []);
 
-  const aviso = document.createElement("div");
-  aviso.className = "aviso";
-  aviso.textContent =
-    "Configuración leída correctamente (revisa la consola del navegador con F12). " +
-    "Todavía no se clasifica nada: es el esqueleto de la interfaz.";
-  mensajes.appendChild(aviso);
+  try {
+    // 2. Cargar y validar el dataset
+    const dat = DatasetValidator.validar(
+      await DatasetLoader.leer(config.archivoDataset, config),
+      config,
+      null,
+    );
+    const avisos = [...dat.avisos];
+    if (dat.errores.length) return mostrarMensajes(dat.errores, avisos);
+    const { atributos, clases } = dat;
+
+    let verdaderas = [],
+      predichas = [];
+    if (config.modo === "externo") {
+      // 3a. Entrena con todo el dataset y prueba con el archivo externo
+      const ext = DatasetValidator.validar(
+        await DatasetLoader.leer(config.archivoExterno, config),
+        config,
+        { atributos, clases },
+      );
+      if (ext.errores.length)
+        return mostrarMensajes(ext.errores, avisos.concat(ext.avisos));
+      avisos.push(
+        ...ext.avisos,
+        `Entrenamiento: ${dat.filas.length} filas. Prueba (archivo externo): ${ext.filas.length} filas.`,
+      );
+      predichas = Clasificador.predecir(
+        dat.filas,
+        ext.filas,
+        atributos,
+        clases,
+        config,
+      );
+      if (!ext.tieneClase) {
+        mostrarMensajes([], avisos);
+        return Resultados.mostrarPredicciones(ext.filas, predichas, atributos);
+      }
+      verdaderas = ext.filas.map((f) => f.clase);
+    } else {
+      // 3b. Mismo dataset: validación simple o cruzada 50%-50%
+      const rondas =
+        config.validacion === "simple"
+          ? [
+              DataSplitter.simple(
+                dat.filas,
+                config.porcentajeEntrenamiento,
+                config.estratificado,
+                SEMILLA,
+              ),
+            ]
+          : DataSplitter.cruzada(dat.filas, SEMILLA);
+      for (const r of rondas) {
+        predichas.push(
+          ...Clasificador.predecir(
+            r.entrenamiento,
+            r.prueba,
+            atributos,
+            clases,
+            config,
+          ),
+        );
+        verdaderas.push(...r.prueba.map((f) => f.clase));
+      }
+      // En la cruzada se juntan las predicciones de las 2 rondas: equivale a sumar las 2 matrices
+      avisos.push(
+        rondas.length === 1
+          ? `Entrenamiento: ${rondas[0].entrenamiento.length} filas. Prueba: ${rondas[0].prueba.length} filas.`
+          : `Validación cruzada: 2 rondas de ${rondas[0].entrenamiento.length} y ${rondas[1].entrenamiento.length} filas; se evaluaron las ${verdaderas.length} filas.`,
+      );
+    }
+
+    // 4. Métricas y resultados
+    mostrarMensajes([], avisos);
+    Resultados.mostrar(Evaluator.evaluar(verdaderas, predichas, clases));
+  } catch (err) {
+    mostrarMensajes(["Error inesperado: " + err.message], []);
+  }
 }
 
 // -----------------------------------------------------
 // Eventos: cada vez que el usuario cambia algo, se actualiza
 // -----------------------------------------------------
 $("formulario").addEventListener("change", actualizarInterfaz);
-$("btnAnalisis").addEventListener("click", alPresionarAnalisis);
+$("btnAnalisis").addEventListener("click", ejecutarAnalisis);
 
 // Estado inicial al abrir la página
 actualizarInterfaz();

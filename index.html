@@ -11,22 +11,19 @@
       <!-- ===================== ENCABEZADO ===================== -->
       <header class="header-panel">
         <h1>Clasificador Bayes Ingenuo</h1>
-        <p>
-          Tarea 10 · Aprendizaje de máquina · Clasificación con variables
-          continuas y discretas
-        </p>
+        <p>Tarea 10</p>
       </header>
 
       <!-- ===================== NAVEGACIÓN RÁPIDA ===================== -->
       <nav class="nav-barra">
         <a href="#sec-dataset">1. Dataset</a>
-        <a href="#sec-pruebas">2. Pruebas</a>
+        <a href="#sec-pruebas">2. Metodo de Pruebas</a>
         <a href="#sec-continuas">3. Variables continuas</a>
         <a href="#sec-resultados">4. Resultados</a>
       </nav>
 
       <form id="formulario" onsubmit="return false;">
-        <!-- ===================== 1. DATASET ===================== -->
+        <!-- ===================== 1. dataset ===================== -->
         <fieldset id="sec-dataset">
           <legend>1. Dataset de entrenamiento</legend>
 
@@ -70,9 +67,9 @@
           </div>
         </fieldset>
 
-        <!-- ===================== 2. MÉTODO DE PRUEBA ===================== -->
+        <!-- ===================== 2. metodo de prueba ===================== -->
         <fieldset id="sec-pruebas">
-          <legend>2. Método de prueba</legend>
+          <legend>2. Metodo de prueba</legend>
 
           <div class="grid-dos-columnas">
             <!-- Opción A: mismo dataset -->
@@ -129,18 +126,18 @@
           </div>
         </fieldset>
 
-        <!-- ===================== 3. VARIABLES CONTINUAS ===================== -->
+        <!-- ===================== 3. variables continuas ===================== -->
         <fieldset id="sec-continuas">
-          <legend>3. Tratamiento de variables continuas</legend>
+          <legend>3. Variables continuas</legend>
 
           <div class="grid-dos-columnas">
             <div class="caja-opcion">
               <label class="titulo-opcion">
                 <input type="radio" name="continuas" value="densidad" checked />
-                Función de densidad
+                Funcion de densidad
               </label>
               <p class="nota">
-                Distribución normal (gaussiana). Todos los atributos continuos
+                Distribucion normal (gaussiana). Todos los atributos continuos
                 se tratan así, sin intervalos.
               </p>
             </div>
@@ -148,7 +145,7 @@
             <div class="caja-opcion">
               <label class="titulo-opcion">
                 <input type="radio" name="continuas" value="binning" />
-                Discretización (data binning)
+                Discretizacion (data binning)
               </label>
 
               <label class="opcion-simple">
@@ -172,7 +169,7 @@
               </label>
 
               <div class="sub-opciones">
-                <label for="intervalos">Intervalo de discretización (k)</label>
+                <label for="intervalos">Intervalo de discretizacion (k)</label>
                 <input
                   type="number"
                   id="intervalos"
@@ -185,9 +182,9 @@
           </div>
         </fieldset>
 
-        <!-- ===================== BOTÓN ===================== -->
+        <!-- ===================== boton ===================== -->
         <div class="barra-accion">
-          <button type="button" id="btnAnalisis">Análisis</button>
+          <button type="button" id="btnAnalisis">Analisis</button>
         </div>
 
         <!-- Errores de validación y avisos -->
@@ -198,14 +195,14 @@
       <fieldset id="sec-resultados">
         <legend>4. Resultados</legend>
 
-        <label>Matriz de confusión</label>
+        <label>Matriz de confusion</label>
         <div class="table-container" id="contenedorMatriz">
-          <p class="vacio">Aún no hay resultados.</p>
+          <p class="vacio">Todavia no hay resultados.</p>
         </div>
 
-        <label class="separado">Métricas de evaluación</label>
+        <label class="separado">Metricas de evaluacion</label>
         <div class="table-container" id="contenedorMetricas">
-          <p class="vacio">Aún no hay resultados.</p>
+          <p class="vacio">Todavia no hay resultados.</p>
         </div>
 
         <div class="grid-kpis separado">
@@ -220,6 +217,14 @@
       </fieldset>
     </div>
 
+    <script src="js/DatasetLoader.js"></script>
+    <script src="js/DatasetValidator.js"></script>
+    <script src="js/DataSplitter.js"></script>
+    <script src="js/Discretizer.js"></script>
+    <script src="js/NaiveBayes.js"></script>
+    <script src="js/Clasificador.js"></script>
+    <script src="js/Evaluator.js"></script>
+    <script src="js/Resultados.js"></script>
     <script src="main.js"></script>
   </body>
 </html>
