@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clasificador Bayes Ingenuo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="contenedor-principal">
+      <!-- ===================== ENCABEZADO ===================== -->
+      <header class="header-panel">
+        <h1>Clasificador Bayes Ingenuo</h1>
+        <p>
+          Tarea 10 · Aprendizaje de máquina · Clasificación con variables
+          continuas y discretas
+        </p>
+      </header>
+
+      <!-- ===================== NAVEGACIÓN RÁPIDA ===================== -->
+      <nav class="nav-barra">
+        <a href="#sec-dataset">1. Dataset</a>
+        <a href="#sec-pruebas">2. Pruebas</a>
+        <a href="#sec-continuas">3. Variables continuas</a>
+        <a href="#sec-resultados">4. Resultados</a>
+      </nav>
+
+      <form id="formulario" onsubmit="return false;">
+        <!-- ===================== 1. DATASET ===================== -->
+        <fieldset id="sec-dataset">
+          <legend>1. Dataset de entrenamiento</legend>
+
+          <div class="grid-formulario">
+            <div>
+              <label for="archivoDataset">Cargar dataset (.csv / .txt)</label>
+              <input type="file" id="archivoDataset" accept=".csv,.txt" />
+            </div>
+
+            <div>
+              <label>Posición de la clase</label>
+              <span class="opciones">
+                <label
+                  ><input type="radio" name="posClase" value="final" checked />
+                  Al final</label
+                >
+                <label
+                  ><input type="radio" name="posClase" value="inicio" /> Al
+                  inicio</label
+                >
+              </span>
+            </div>
+
+            <div>
+              <label for="separador">Separador</label>
+              <select id="separador">
+                <option value=",">Coma ( , )</option>
+                <option value=";">Punto y coma ( ; )</option>
+                <option value="\t">Tabulador</option>
+                <option value=" ">Espacio</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="tieneEncabezado">Encabezado</label>
+              <label class="opcion-simple">
+                <input type="checkbox" id="tieneEncabezado" checked />
+                La primera fila trae los nombres
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- ===================== 2. MÉTODO DE PRUEBA ===================== -->
+        <fieldset id="sec-pruebas">
+          <legend>2. Método de prueba</legend>
+
+          <div class="grid-dos-columnas">
+            <!-- Opción A: mismo dataset -->
+            <div class="caja-opcion">
+              <label class="titulo-opcion">
+                <input type="radio" name="modo" value="mismo" checked /> Usar el
+                mismo dataset
+              </label>
+
+              <label class="opcion-simple">
+                <input type="radio" name="validacion" value="simple" checked />
+                Validación simple
+              </label>
+
+              <div class="sub-opciones">
+                <label for="porcentaje">% de entrenamiento</label>
+                <input
+                  type="number"
+                  id="porcentaje"
+                  min="1"
+                  max="99"
+                  value="80"
+                />
+                <label class="opcion-simple">
+                  <input type="checkbox" id="estratificado" checked /> Selección
+                  estratificada (mismo % por clase)
+                </label>
+              </div>
+
+              <label class="opcion-simple">
+                <input type="radio" name="validacion" value="cruzada" />
+                Validación cruzada (50%-50%)
+              </label>
+            </div>
+
+            <!-- Opción B: archivo externo -->
+            <div class="caja-opcion">
+              <label class="titulo-opcion">
+                <input type="radio" name="modo" value="externo" /> Archivo de
+                pruebas externo
+              </label>
+              <p class="nota">
+                Se entrena con todo el dataset y se prueba con las instancias de
+                este archivo (1 o más). Debe tener el mismo formato que el
+                dataset.
+              </p>
+              <input
+                type="file"
+                id="archivoExterno"
+                accept=".csv,.txt"
+                disabled
+              />
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- ===================== 3. VARIABLES CONTINUAS ===================== -->
+        <fieldset id="sec-continuas">
+          <legend>3. Tratamiento de variables continuas</legend>
+
+          <div class="grid-dos-columnas">
+            <div class="caja-opcion">
+              <label class="titulo-opcion">
+                <input type="radio" name="continuas" value="densidad" checked />
+                Función de densidad
+              </label>
+              <p class="nota">
+                Distribución normal (gaussiana). Todos los atributos continuos
+                se tratan así, sin intervalos.
+              </p>
+            </div>
+
+            <div class="caja-opcion">
+              <label class="titulo-opcion">
+                <input type="radio" name="continuas" value="binning" />
+                Discretización (data binning)
+              </label>
+
+              <label class="opcion-simple">
+                <input
+                  type="radio"
+                  name="tipoBinning"
+                  value="anchos"
+                  checked
+                  disabled
+                />
+                Intervalos de anchos iguales
+              </label>
+              <label class="opcion-simple">
+                <input
+                  type="radio"
+                  name="tipoBinning"
+                  value="frecuencias"
+                  disabled
+                />
+                Intervalos de frecuencias iguales
+              </label>
+
+              <div class="sub-opciones">
+                <label for="intervalos">Intervalo de discretización (k)</label>
+                <input
+                  type="number"
+                  id="intervalos"
+                  min="2"
+                  value="4"
+                  disabled
+                />
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- ===================== BOTÓN ===================== -->
+        <div class="barra-accion">
+          <button type="button" id="btnAnalisis">Análisis</button>
+        </div>
+
+        <!-- Errores de validación y avisos -->
+        <div id="mensajes"></div>
+      </form>
+
+      <!-- ===================== 4. RESULTADOS ===================== -->
+      <fieldset id="sec-resultados">
+        <legend>4. Resultados</legend>
+
+        <label>Matriz de confusión</label>
+        <div class="table-container" id="contenedorMatriz">
+          <p class="vacio">Aún no hay resultados.</p>
+        </div>
+
+        <label class="separado">Métricas de evaluación</label>
+        <div class="table-container" id="contenedorMetricas">
+          <p class="vacio">Aún no hay resultados.</p>
+        </div>
+
+        <div class="grid-kpis separado">
+          <div class="kpi-box">
+            <div class="kpi-box-title">Accuracy</div>
+            <div class="kpi-box-val" id="accuracy">—</div>
+            <div class="kpi-box-desc">
+              Aciertos / total de instancias de prueba
+            </div>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+
+    <script src="main.js"></script>
+  </body>
+</html>

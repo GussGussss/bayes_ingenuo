@@ -1,0 +1,414 @@
+/* ==========================================================================
+   CLASIFICADOR BAYES INGENUO - ESTILOS
+   Diseño sencillo y plano (estilo tarea académica UAS): verde institucional,
+   acentos amarillos, sin sombras ni degradados.
+   ========================================================================== */
+
+/* ---------- Paleta (para cambiar colores en un solo lugar) ---------- */
+:root {
+  --verde-oscuro: #204e1e;
+  --verde: #2d6a2e;
+  --verde-medio: #3b7a37;
+  --verde-borde: #a3c293;
+  --verde-borde-suave: #d1e2cb;
+  --verde-fondo: #f4f7f2;
+  --verde-claro: #eaf1e6;
+  --texto: #1b3815;
+  --texto-suave: #4b6b47;
+  --amarillo: #eab308;
+  --amarillo-borde: #ca8a04;
+  --amarillo-claro: #fef9c3;
+  --amarillo-texto: #854d0e;
+  --rojo-fondo: #fee2e2;
+  --rojo-borde: #f87171;
+  --rojo-texto: #991b1b;
+  --blanco: #ffffff;
+  --campo: #fcfdfa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--verde-fondo);
+  color: var(--texto);
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 20px;
+}
+
+.contenedor-principal {
+  max-width: 1050px;
+  margin: 0 auto;
+}
+
+/* ==========================================================================
+   ENCABEZADO Y NAVEGACIÓN
+   ========================================================================== */
+.header-panel {
+  background-color: var(--verde);
+  border-bottom: 4px solid var(--amarillo);
+  color: var(--blanco);
+  padding: 14px 18px;
+  margin-bottom: 16px;
+}
+
+.header-panel h1 {
+  font-size: 19px;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.header-panel p {
+  font-size: 12px;
+  margin: 5px 0 0 0;
+  color: #fef08a;
+  line-height: 1.4;
+}
+
+.nav-barra {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  background-color: var(--verde-claro);
+  padding: 8px 12px;
+  border: 1px solid var(--verde-borde);
+}
+
+.nav-barra a {
+  color: var(--verde-oscuro);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px 9px;
+  border: 1px solid var(--verde-borde);
+  background-color: var(--blanco);
+}
+
+.nav-barra a:hover {
+  background-color: var(--amarillo);
+  border-color: var(--amarillo-borde);
+  color: #1f2937;
+}
+
+/* ==========================================================================
+   SECCIONES (fieldset + legend)
+   ========================================================================== */
+fieldset {
+  border: 1px solid var(--verde-borde);
+  background-color: var(--blanco);
+  margin: 0 0 18px 0;
+  padding: 14px 16px;
+  min-width: 0;
+}
+
+legend {
+  font-size: 12.5px;
+  font-weight: bold;
+  color: var(--verde-oscuro);
+  padding: 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* ==========================================================================
+   ETIQUETAS Y CONTROLES
+   ========================================================================== */
+label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #375534;
+}
+
+input[type="number"],
+input[type="text"],
+select {
+  font-family: inherit;
+  font-size: 13px;
+  border: 1px solid #8ca67a;
+  background-color: var(--campo);
+  padding: 5px 7px;
+}
+
+input[type="number"]:focus,
+input[type="text"]:focus,
+select:focus {
+  border-color: var(--amarillo);
+  outline: none;
+  background-color: var(--blanco);
+}
+
+input[type="file"] {
+  font-family: inherit;
+  font-size: 12px;
+  max-width: 100%;
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+  accent-color: var(--verde);
+}
+
+input:disabled,
+select:disabled {
+  background-color: #e5e9e1;
+  color: #8a9a85;
+  cursor: not-allowed;
+}
+
+/* ---------- Botones ---------- */
+button {
+  background-color: var(--amarillo);
+  border: 1px solid var(--amarillo-borde);
+  color: #1f2937;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 7px 24px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #facc15;
+}
+
+button:active {
+  background-color: var(--amarillo-borde);
+}
+
+.barra-accion {
+  margin: 4px 0 14px 0;
+}
+
+/* ==========================================================================
+   DISTRIBUCIÓN (grillas)
+   ========================================================================== */
+.grid-formulario {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.grid-formulario > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.grid-dos-columnas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+@media (max-width: 820px) {
+  .grid-dos-columnas {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Opciones (radios, checkboxes) ---------- */
+.opciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.opciones label,
+.opcion-simple {
+  font-weight: normal;
+  color: var(--texto);
+}
+
+.opcion-simple {
+  display: block;
+  margin: 6px 0;
+}
+
+.caja-opcion {
+  background-color: var(--campo);
+  border: 1px solid var(--verde-borde-suave);
+  padding: 10px 12px;
+}
+
+.titulo-opcion {
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--verde-oscuro);
+  margin-bottom: 8px;
+}
+
+.sub-opciones {
+  margin: 4px 0 8px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: flex-start;
+}
+
+.sub-opciones input[type="number"] {
+  width: 90px;
+}
+
+.nota {
+  font-size: 12px;
+  color: var(--texto-suave);
+  line-height: 1.4;
+  margin: 0 0 8px 0;
+}
+
+/* ==========================================================================
+   MENSAJES (errores de validación y avisos)
+   ========================================================================== */
+#mensajes .error,
+#mensajes .aviso {
+  padding: 8px 12px;
+  margin-top: 8px;
+  font-size: 12.5px;
+  font-weight: bold;
+}
+
+#mensajes .error {
+  background-color: var(--rojo-fondo);
+  border: 1px solid var(--rojo-borde);
+  color: var(--rojo-texto);
+}
+
+#mensajes .aviso {
+  background-color: var(--amarillo-claro);
+  border: 1px solid var(--amarillo-borde);
+  color: var(--amarillo-texto);
+}
+
+/* ==========================================================================
+   RESULTADOS: tablas y accuracy
+   ========================================================================== */
+.separado {
+  display: block;
+  margin-top: 14px;
+}
+
+.table-container {
+  overflow-x: auto;
+  border: 1px solid var(--verde-borde);
+  margin-top: 8px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--blanco);
+}
+
+th {
+  background-color: var(--verde-medio);
+  color: var(--blanco);
+  font-size: 12px;
+  border: 1px solid var(--verde);
+  padding: 7px 8px;
+  text-align: center;
+}
+
+td {
+  border: 1px solid var(--verde-borde-suave);
+  padding: 6px 8px;
+  font-size: 12px;
+  text-align: center;
+}
+
+tr:nth-child(even) {
+  background-color: #f8faf6;
+}
+
+tfoot tr.total-row {
+  background-color: #e8f2e4;
+  font-weight: bold;
+}
+
+tfoot tr.total-row td {
+  border-top: 2px solid var(--verde);
+}
+
+/* Celdas destacadas (por ejemplo, la diagonal de la matriz de confusión) */
+.score-cell {
+  font-weight: bold;
+  color: var(--amarillo-texto);
+  background-color: var(--amarillo-claro);
+}
+
+.vacio {
+  margin: 8px;
+  color: #6b7f67;
+  font-size: 12px;
+}
+
+/* ---------- Accuracy (cuadro aparte) ---------- */
+.grid-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.kpi-box {
+  border: 1px solid var(--verde-borde);
+  background-color: var(--campo);
+  padding: 10px;
+  text-align: center;
+}
+
+.kpi-box-title {
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--verde-oscuro);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.kpi-box-val {
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--texto);
+  font-family: "Courier New", Courier, monospace;
+}
+
+.kpi-box-desc {
+  font-size: 11px;
+  color: var(--texto-suave);
+  margin-top: 3px;
+}
+
+/* ==========================================================================
+   UTILIDADES
+   ========================================================================== */
+.hidden {
+  display: none !important;
+}
+
+/* ---------- Impresión ---------- */
+@media print {
+  body {
+    background-color: var(--blanco);
+    padding: 0;
+    color: #000;
+  }
+  .nav-barra,
+  button {
+    display: none !important;
+  }
+  fieldset {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  th {
+    background-color: #ddd !important;
+    color: #000 !important;
+  }
+}
