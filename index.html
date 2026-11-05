@@ -20,6 +20,7 @@
         <a href="#sec-pruebas">2. Metodo de Pruebas</a>
         <a href="#sec-continuas">3. Variables continuas</a>
         <a href="#sec-resultados">4. Resultados</a>
+        <a href="#sec-graficas">5. Gráficas</a>
       </nav>
 
       <form id="formulario" onsubmit="return false;">
@@ -215,6 +216,23 @@
           </div>
         </div>
       </fieldset>
+
+      <!-- ===================== 5. GRÁFICAS ===================== -->
+      <fieldset id="sec-graficas">
+        <legend>5. Graficas</legend>
+        <p class="nota">
+          Genera graficas del dataset cargado y de la configuracion elegida:
+          distribución de las clases y de cada atributo, metricas por clase y
+          comparacion de tratamientos de variables continuas. Cada grafica se
+          puede descargar como imagen PNG.
+        </p>
+        <div class="barra-accion">
+          <button type="button" id="btnGraficas">Generar gráficas</button>
+        </div>
+        <div id="contenedorGraficas" class="graficas-grid">
+          <p class="vacio">Aún no hay gráficas.</p>
+        </div>
+      </fieldset>
     </div>
 
     <script src="js/DatasetLoader.js"></script>
@@ -225,6 +243,7 @@
     <script src="js/Clasificador.js"></script>
     <script src="js/Evaluator.js"></script>
     <script src="js/Resultados.js"></script>
+    <script src="js/Graficas.js"></script>
     <script src="main.js"></script>
   </body>
 </html>

@@ -19,6 +19,9 @@ class Resultados {
     document.getElementById("contenedorMetricas").innerHTML =
       '<p class="vacio">Aún no hay resultados.</p>';
     document.getElementById("accuracy").textContent = "—";
+    // las gráficas anteriores ya no corresponden a estos resultados
+    document.getElementById("contenedorGraficas").innerHTML =
+      '<p class="vacio">Aún no hay gráficas.</p>';
   }
 
   // Función principal para construir y mostrar las tablas de resultados y métricas completas

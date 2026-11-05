@@ -412,3 +412,41 @@ tfoot tr.total-row td {
     color: #000 !important;
   }
 }
+
+/* ---------- Gráficas ---------- */
+.graficas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.graficas-grid .vacio {
+  grid-column: 1 / -1;
+}
+
+.grafica {
+  margin: 0;
+  padding: 8px;
+  background-color: var(--blanco);
+  border: 1px solid var(--verde-borde);
+  text-align: center;
+}
+
+.grafica svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.btn-png {
+  margin-top: 6px;
+  padding: 4px 12px;
+  font-size: 12px;
+}
+
+@media print {
+  .btn-png {
+    display: none !important;
+  }
+}

@@ -217,4 +217,27 @@ obtenerElementoPorId("formulario").addEventListener(
 );
 obtenerElementoPorId("btnAnalisis").addEventListener("click", ejecutarAnalisis);
 
+// Botón "Generar gráficas": gráficas del dataset y de la configuración actual (ver Graficas.js)
+async function generarGraficas() {
+  const objetoConfiguracion = leerConfiguracion();
+  mostrarMensajes([], []);
+  const erroresParametros =
+    DatasetValidator.validarParametros(objetoConfiguracion);
+  if (erroresParametros.length) return mostrarMensajes(erroresParametros, []);
+  try {
+    await Graficas.generar(objetoConfiguracion, SEMILLA_REPRODUCIBLE);
+  } catch (errorExcepcion) {
+    mostrarMensajes(["Error inesperado: " + errorExcepcion.message], []);
+  }
+}
+obtenerElementoPorId("btnGraficas").addEventListener("click", generarGraficas);
+// Un solo escuchador para todos los botones "Descargar PNG"
+obtenerElementoPorId("contenedorGraficas").addEventListener(
+  "click",
+  (eventoClic) => {
+    const botonPng = eventoClic.target.closest(".btn-png");
+    if (botonPng) Graficas.descargarPng(Number(botonPng.dataset.indiceGrafica));
+  },
+);
+
 actualizarInterfaz();
